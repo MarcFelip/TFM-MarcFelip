@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="login">Log In</string>
+    <string name="register">Register</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="logout">Log Out</string>
+    <string name="add_image">Add Image</string>
+    <string name="name">Name</string>
+    <string name="email">Email</string>
+    <string name="edit">Edit Profile</string>
+    <string name="reset_password">Reset Password</string>
+    <string name="load_image">Load Image</string>
+    <string name="apple_size">Apple Size</string>
+    <string name="select_image">Take/Select Photo</string>
+    <string name="save_profile">Save Profile</string>
+
+</resources>
