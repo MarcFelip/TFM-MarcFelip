@@ -5,12 +5,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.jetbrains.androidApp.R
 import com.jetbrains.kmm.androidApp.login.LoginActivity
-import com.jetbrains.kmm.androidApp.main.MainActivity
 import kotlinx.coroutines.launch
 
 class RegisterActivity : AppCompatActivity() {
@@ -20,7 +20,7 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_register)
 
         val register_button: Button = findViewById(R.id.register)
-        val login_button: Button = findViewById(R.id.login)
+        val login_button: TextView = findViewById(R.id.login)
         val username: EditText = findViewById(R.id.username)
         val password: EditText = findViewById(R.id.password)
 

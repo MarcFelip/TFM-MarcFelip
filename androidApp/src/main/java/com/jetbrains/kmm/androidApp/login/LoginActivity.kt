@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -19,8 +20,8 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        val register_button: Button = findViewById(R.id.register)
-        val login_button: Button = findViewById(R.id.login)
+        val register_button: TextView = findViewById(R.id.login)
+        val login_button: Button = findViewById(R.id.register)
         val username: EditText = findViewById(R.id.username)
         val password: EditText = findViewById(R.id.password)
 

@@ -17,7 +17,9 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.google.android.material.textfield.TextInputEditText
 import com.jetbrains.androidApp.R
+import com.jetbrains.kmm.androidApp.addProject.AddProjectActivity
 import com.jetbrains.kmm.androidApp.profile.ProfileActivity
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,19 +38,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val add_image_button: ImageButton = findViewById(R.id.add_image)
-        val user_button: ImageButton = findViewById(R.id.user_button)
+        val user_button: ImageButton = findViewById(R.id.btn_profile)
+        val new_project_button: Button = findViewById(R.id.btn_new_project)
 
         user_button.setOnClickListener{
             val intent = Intent(this@MainActivity, ProfileActivity::class.java)
             startActivity(intent)
         }
 
-        add_image_button.setOnClickListener{
-            showDialog()
+        new_project_button.setOnClickListener{
+            val intent = Intent(this@MainActivity, AddProjectActivity::class.java)
+            startActivity(intent)
         }
-
-
     }
 
     private fun showDialog(){

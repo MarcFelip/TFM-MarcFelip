@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    tools:context="com.jetbrains.kmm.androidApp.addProject.AddProjectActivity">
+
+  <ImageButton
+      android:id="@+id/btn_profile"
+      android:layout_width="50dp"
+      android:layout_height="50dp"
+      android:layout_marginTop="25dp"
+      android:layout_marginEnd="25dp"
+      android:background="@drawable/user_red"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="parent" >
+  </ImageButton>
+
+  <TextView
+      android:id="@+id/textView"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="100dp"
+      android:text="@string/new_project"
+      android:textColor="@color/text_color"
+      android:textSize="32sp"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent">
+  </TextView>
+
+  <LinearLayout
+      android:id="@+id/linearLayout"
+      android:layout_width="200dp"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="50dp"
+      android:background="@drawable/login_card"
+      android:orientation="vertical"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0.497"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/textView">
+
+    <EditText
+        android:id="@+id/name_project"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="1dp"
+        android:background="@color/white"
+        android:ems="10"
+        android:hint="@string/project_name"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+  </LinearLayout>
+
+  <LinearLayout
+      android:id="@+id/linearLayout2"
+      android:layout_width="200dp"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="30dp"
+      android:background="@drawable/login_card"
+      android:orientation="vertical"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0.497"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+
+    <EditText
+        android:id="@+id/location"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="1dp"
+        android:background="@color/white"
+        android:ems="10"
+        android:hint="@string/location"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+  </LinearLayout>
+
+  <LinearLayout
+      android:id="@+id/linearLayout3"
+      android:layout_width="200dp"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="30dp"
+      android:background="@drawable/login_card"
+      android:orientation="vertical"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0.497"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
+
+    <EditText
+        android:id="@+id/variety"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="1dp"
+        android:background="@color/white"
+        android:ems="10"
+        android:hint="@string/variety"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+  </LinearLayout>
+
+  <LinearLayout
+      android:id="@+id/linearLayout4"
+      android:layout_width="200dp"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="30dp"
+      android:background="@drawable/login_card"
+      android:orientation="vertical"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0.497"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
+
+    <EditText
+        android:id="@+id/data"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="1dp"
+        android:background="@color/white"
+        android:ems="10"
+        android:hint="@string/data"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+  </LinearLayout>
+
+  <Button
+      android:id="@+id/btn_cancel"
+      android:layout_width="120dp"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="60dp"
+      android:layout_marginBottom="56dp"
+      android:background="@drawable/signin_btn"
+      android:text="@string/cancel"
+      android:textAllCaps="false"
+      android:textSize="20sp"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintStart_toStartOf="parent" />
+
+  <Button
+      android:id="@+id/btn_create"
+      android:layout_width="120dp"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="60dp"
+      android:layout_marginBottom="56dp"
+      android:background="@drawable/signin_btn"
+      android:text="@string/create"
+      android:textAllCaps="false"
+      android:textSize="20sp"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

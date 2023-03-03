@@ -28,9 +28,9 @@ class ProfileActivity : AppCompatActivity() {
         val user_img: ImageView = findViewById(R.id.profile_image)
         val user_name: TextView = findViewById(R.id.user_name)
         val user_email: TextView = findViewById(R.id.user_email)
-        val edit_button: Button = findViewById(R.id.edit_user_data_button)
-        val password_button: Button = findViewById(R.id.reset_password_button)
-        val logout_button: Button = findViewById(R.id.logout)
+        val edit_button: TextView = findViewById(R.id.edit_profile_button)
+        val password_button: TextView = findViewById(R.id.change_password_button)
+        val logout_button: ImageButton = findViewById(R.id.logout)
 
         viewModel = ViewModelProvider(this).get(ProfileViewModel::class.java)
 
@@ -50,18 +50,23 @@ class ProfileActivity : AppCompatActivity() {
         }
 
         edit_button.setOnClickListener{
-            showDialog()
+            showProfileDialog()
+        }
+
+        password_button.setOnClickListener{
+            showPasswordDialog()
         }
 
     }
 
-    private fun showDialog(){
+    private fun showProfileDialog(){
         val dialog = MaterialDialog(this).noAutoDismiss()
             .customView(R.layout.dialog_edit_profile)
 
         val btn_save = dialog.findViewById<Button>(R.id.btn_save_profile)
-        val name_value = dialog.findViewById<TextInputEditText>(R.id.name)
-        val email_value = dialog.findViewById<TextInputEditText>(R.id.email)
+        val btn_cancel = dialog.findViewById<Button>(R.id.btn_cancel)
+        val name_value = dialog.findViewById<EditText>(R.id.username)
+        val email_value = dialog.findViewById<EditText>(R.id.email)
 
         btn_save.setOnClickListener{
             lifecycleScope.launch {
@@ -76,6 +81,13 @@ class ProfileActivity : AppCompatActivity() {
                 }
             }
         }
+
+        dialog.show()
+    }
+
+    private fun showPasswordDialog(){
+        val dialog = MaterialDialog(this).noAutoDismiss()
+            .customView(R.layout.dialog_change_password)
 
         dialog.show()
     }

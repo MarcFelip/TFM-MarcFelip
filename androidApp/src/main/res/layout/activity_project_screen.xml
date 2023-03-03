@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background"
-    tools:context="com.jetbrains.kmm.androidApp.main.MainActivity">
+    tools:context="com.jetbrains.kmm.androidApp.project.ProjectActivity">
 
   <ImageButton
       android:id="@+id/btn_profile"
@@ -19,12 +19,22 @@
       app:layout_constraintTop_toTopOf="parent" >
   </ImageButton>
 
+  <ImageButton
+      android:id="@+id/btn_edit_project"
+      android:layout_width="30dp"
+      android:layout_height="30dp"
+      android:layout_marginStart="10dp"
+      android:layout_marginTop="34dp"
+      android:background="@drawable/red_pen"
+      app:layout_constraintStart_toEndOf="@+id/textView"
+      app:layout_constraintTop_toBottomOf="@+id/btn_profile" />
+
   <TextView
       android:id="@+id/textView"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginTop="100dp"
-      android:text="@string/projects"
+      android:text="@string/project_name"
       android:textColor="@color/text_color"
       android:textSize="32sp"
       app:layout_constraintEnd_toEndOf="parent"
@@ -33,12 +43,12 @@
   </TextView>
 
   <Button
-      android:id="@+id/btn_new_project"
+      android:id="@+id/btn_add_img"
       android:layout_width="180dp"
       android:layout_height="wrap_content"
       android:layout_marginBottom="52dp"
       android:background="@drawable/signin_btn"
-      android:text="@string/new_project"
+      android:text="@string/add_image"
       android:textAllCaps="false"
       android:textSize="20sp"
       app:layout_constraintBottom_toBottomOf="parent"

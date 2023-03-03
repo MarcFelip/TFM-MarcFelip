@@ -7,4 +7,19 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="aliceblue">#F0F8FF</color>
+
+    <color name="screen_background">#F2F2F2</color>
+    <color name="rectangle_1_color">#FFFFFF</color>
+    <color name="button_color">#A3305C</color>
+    <color name="line_1_color">#DCDBDB</color>
+    <color name="edittext_color">#9F9F9F</color>
+    <color name="ellipse_1_color">#D9D9D9</color>
+    <color name="_button_ek1_color">#ffffff</color>
+    <color name="line">#B9B9B9</color>
+    <color name="ellipse_3_color">#AD3563</color>
+    <color name="textview_color">#6C6C6C</color>
+    <color name="forgot">#A3305C</color>
+    <color name="text_color">#9C1347</color>
+    <color name="username">#5B5B5B</color>
+
 </resources>

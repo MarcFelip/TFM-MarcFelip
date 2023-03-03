@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="login">Log In</string>
+    <string name="login">Login</string>
+    <string name="signin">Sign In</string>
+    <string name="signup">Sign Up</string>
     <string name="register">Register</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
@@ -11,9 +13,24 @@
     <string name="email">Email</string>
     <string name="edit">Edit Profile</string>
     <string name="reset_password">Reset Password</string>
-    <string name="load_image">Load Image</string>
     <string name="apple_size">Apple Size</string>
     <string name="select_image">Take/Select Photo</string>
-    <string name="save_profile">Save Profile</string>
+    <string name="save">Save</string>
+    <string name="forgot">Forgot your password?</string>
+    <string name="projects">Projects</string>
+    <string name="new_project">New Project</string>
+    <string name="project_name">Project Name</string>
+    <string name="data">Data</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="change_pwd">Change Password</string>
+    <string name="create">Create</string>
+    <string name="cancel">Cancel</string>
+    <string name="location">Location</string>
+    <string name="variety">Variety</string>
+    <string name="id">ID</string>
+    <string name="size">Size</string>
+    <string name="old_password">Old Password</string>
+    <string name="new_password">New Password</string>
+    <string name="repeat_password">Repeat Password</string>
 
 </resources>

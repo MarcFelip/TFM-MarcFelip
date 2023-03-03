@@ -21,6 +21,8 @@
         <activity android:name="com.jetbrains.kmm.androidApp.main.MainActivity"/>
         <activity android:name="com.jetbrains.kmm.androidApp.register.RegisterActivity"/>
         <activity android:name="com.jetbrains.kmm.androidApp.profile.ProfileActivity"/>
+        <activity android:name="com.jetbrains.kmm.androidApp.project.ProjectActivity"/>
+        <activity android:name="com.jetbrains.kmm.androidApp.addProject.AddProjectActivity"/>
 
     </application>
 
