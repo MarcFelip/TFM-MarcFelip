@@ -21,7 +21,7 @@ public class ProjectViewModel : ViewModel() {
             image.compress(Bitmap.CompressFormat.PNG, 100, stream)
             val imageBytes = stream.toByteArray()
 
-            repo.addLabeledImage(imageBytes, float_size)
+            //repo.addMeasuredImages(imageBytes, float_size)
 
             true
         } catch (e: Exception) {

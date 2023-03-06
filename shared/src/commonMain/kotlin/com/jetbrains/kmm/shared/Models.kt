@@ -4,6 +4,7 @@ import io.realm.kotlin.types.ObjectId
 import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 
+
 class Models {
     class UserInfo : RealmObject {
         @PrimaryKey
@@ -11,16 +12,26 @@ class Models {
         var name: String = ""
         var email: String = ""
         var isAdmin: Boolean = false
-        var image: String = ""
+        var image: String? = null
     }
 
-    class LabeledImages : RealmObject {
+    class MeasuredImages : RealmObject {
         @PrimaryKey
         var _id: ObjectId = ObjectId.create()
-        var user_id: String = ""
-        var size: Float = 0.0F
+        var project_id: String? = null
+        var size: Float? = null
         var appleImage: ByteArray? = null
-       // var appleImage: ByteArray = ByteArray(0)
+        var measurementId: String? = null
+    }
+
+    class Projects : RealmObject {
+        @PrimaryKey
+        var _id: ObjectId = ObjectId.create()
+        var name: String = "null"
+        var location: String? = null
+        var variety: String? = null
+        var data: String? = null
+        var userId: String = ""
     }
 
 }

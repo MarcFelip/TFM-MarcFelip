@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
 
 class RealmRepo {
 
-    private val schemaClass = setOf(Models.UserInfo::class, Models.LabeledImages::class)
+    private val schemaClass = setOf(Models.UserInfo::class, Models.MeasuredImages::class)
 
     private val appService by lazy {
         val appConfiguration =
@@ -80,16 +80,32 @@ class RealmRepo {
     }
 
     // Function used to add a new labeled Image
-    suspend fun addLabeledImage(image: ByteArray, size: Float) {
+    suspend fun addMeasuredImages(size: Float) {
         withContext(Dispatchers.Default) {
             realm.write {
                 val userId = appService.currentUser!!.id
-                val labeledImage = Models.LabeledImages().apply {
+                val labeledImage = Models.MeasuredImages().apply {
                     this.size = size
-                    this.appleImage = image
-                    this.user_id = userId // add the user object to the labeled image
+                    //this.user_id = userId // add the user object to the labeled image
                 }
                 copyToRealm(labeledImage)
+            }
+        }
+    }
+
+    suspend fun addProject(name: String, location: String, variety: String, data: String) {
+        withContext(Dispatchers.Default) {
+            realm.write {
+                val userId = appService.currentUser!!.id
+
+                val newProject = Models.Projects().apply {
+                    this.name = name
+                    this.location = location
+                    this.variety = variety
+                    this.data = data
+                    this.userId = userId // add the user object to the labeled image
+                }
+                copyToRealm(newProject)
             }
         }
     }
