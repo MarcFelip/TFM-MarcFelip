@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.jetbrains.androidApp.R
 import com.jetbrains.kmm.androidApp.login.LoginActivity
+import com.jetbrains.kmm.androidApp.main.MainActivity
 import kotlinx.coroutines.launch
 
 class RegisterActivity : AppCompatActivity() {
@@ -31,7 +32,7 @@ class RegisterActivity : AppCompatActivity() {
                 val registerSuccess = viewModel.registration(username.text.toString(), password.text.toString())
 
                 if (registerSuccess) {
-                    val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
+                    val intent = Intent(this@RegisterActivity, MainActivity::class.java)
                     startActivity(intent)
                 } else {
                     Toast.makeText(this@RegisterActivity, "Registration Error", Toast.LENGTH_SHORT).show()

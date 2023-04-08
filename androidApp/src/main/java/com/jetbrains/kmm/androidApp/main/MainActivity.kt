@@ -52,50 +52,5 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showDialog(){
-        val dialog = MaterialDialog(this).noAutoDismiss()
-            .customView(R.layout.dialog_add_image)
 
-        val btn_img = dialog.findViewById<Button>(R.id.btn_select_img)
-        val btn_save = dialog.findViewById<Button>(R.id.btn_save_img)
-        val edit_size = dialog.findViewById<TextInputEditText>(R.id.size)
-
-        image_view =  dialog.findViewById<ImageView>(R.id.imageView)
-
-        btn_img.setOnClickListener{
-            take_photo()
-        }
-
-        btn_save.setOnClickListener{
-            lifecycleScope.launch {
-                val addingSuccess = viewModel.addLabeledImage(final_image, edit_size.text.toString())
-
-                if (addingSuccess) {
-                    Toast.makeText(this@MainActivity, "!!!!!!!!!!!!!!!!!!!!!!!!!", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this@MainActivity, "Error Adding the Data", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-
-        dialog.show()
-    }
-
-    private fun take_photo(){
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        startActivityForResult(intent, CAMERA_REQUEST_CODE)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CAMERA_REQUEST_CODE){
-            image = data?.extras?.get("data") as Bitmap
-            if (image != null) {
-                final_image = image as Bitmap
-                image_view.setImageBitmap(image)
-            }else{
-                take_photo()
-            }
-        }
-    }
 }

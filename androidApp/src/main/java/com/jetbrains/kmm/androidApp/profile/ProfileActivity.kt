@@ -4,8 +4,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.google.android.material.textfield.TextInputEditText
@@ -93,21 +96,21 @@ class ProfileActivity : AppCompatActivity() {
     }
 
 
-    /*
+
     @Composable
     fun get_data (): Pair <String, String> {
         val profileVM: ProfileViewModel = viewModel()
 
-        val name: String
-        val email: String
+        var name: String = ""
+        var email: String = ""
         profileVM.userInfo.observeAsState().apply {
             this.value?.let {
-                name = it.name
-                email = it.email
+                name = it.name.toString()
+                email = it.email.toString()
             }
         }
         return Pair(name, email)
     }
-    */
+
 
 }

@@ -11,7 +11,6 @@ public class AddProjectViewModel : ViewModel() {
     private val _added = MutableLiveData<Boolean>()
     val added: LiveData<Boolean> = _added
 
-    val alreadyLoggedIn: LiveData<Boolean> = repo.isUserLoggedIn().asLiveData(Dispatchers.Main)
 
     suspend fun addProject(name: String, location: String, variety: String, data: String): Boolean {
         return try {

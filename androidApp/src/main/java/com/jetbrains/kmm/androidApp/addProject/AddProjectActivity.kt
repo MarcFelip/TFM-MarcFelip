@@ -42,22 +42,23 @@ class AddProjectActivity : AppCompatActivity() {
         }
 
         create_button.setOnClickListener{
-            var name_str = name.text.toString()
-            var location_str = location.text.toString()
-            var variety_str = variety.text.toString()
-            var data_str = data.text.toString()
+            lifecycleScope.launch {
+                val name_str = name.text.toString()
+                val location_str = location.text.toString()
+                val variety_str = variety.text.toString()
+                val data_str = data.text.toString()
 
-            lifecycleScope.launch{
                 val addSucces = viewModel.addProject(name_str, location_str, variety_str, data_str)
 
-                if(addSucces){
+                if (addSucces) {
                     val intent = Intent(this@AddProjectActivity, ProjectActivity::class.java)
                     startActivity(intent)
+                } else {
+                    Toast.makeText(
+                        this@AddProjectActivity,"Can't create the project",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
-                else{
-                    Toast.makeText(this@AddProjectActivity, "Can't create the project", Toast.LENGTH_SHORT).show()
-                }
-
             }
         }
 

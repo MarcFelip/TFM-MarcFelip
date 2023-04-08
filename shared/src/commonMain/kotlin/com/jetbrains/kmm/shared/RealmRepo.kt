@@ -8,6 +8,7 @@ import io.realm.kotlin.mongodb.AppConfiguration
 import io.realm.kotlin.mongodb.Credentials
 import io.realm.kotlin.mongodb.User
 import io.realm.kotlin.mongodb.sync.SyncConfiguration
+import io.realm.kotlin.types.ObjectId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -15,12 +16,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class RealmRepo {
-
-    private val schemaClass = setOf(Models.UserInfo::class, Models.MeasuredImages::class)
+    private val schemaClass = setOf(Models.UserInfo::class, Models.MeasuredImages::class, Models.Projects::class)
 
     private val appService by lazy {
         val appConfiguration =
-            AppConfiguration.Builder(appId = "tfm-rcttp").log(LogLevel.ALL).build()
+            AppConfiguration.Builder(appId = "tfmmarcfelip-vytmb").log(LogLevel.ALL).build()
         App.create(appConfiguration)
     }
 
@@ -40,6 +40,19 @@ class RealmRepo {
 
     suspend fun registration(email: String, password: String) {
         appService.emailPasswordAuth.registerUser(email, password)
+        login(email, password)
+
+        realm.write {
+            val userId = appService.currentUser!!.id
+            val id  = createObjectIdString()
+            val newUserInfo = Models.UserInfo().apply {
+                this._id = id
+                this.name = ""
+                this.email = email
+                this.userId = userId
+            }
+            copyToRealm(newUserInfo)
+        }
 
     }
 
@@ -51,10 +64,16 @@ class RealmRepo {
         appService.currentUser?.logOut()
     }
 
+    fun createObjectIdString(): String {
+        val objectId = ObjectId.create().toString()
+        return objectId
+    }
+
     // Function used to get the user profile
     fun getUserProfile(): Flow<Models.UserInfo?> {
         val userId = appService.currentUser!!.id
-        val user = realm.query<Models.UserInfo>("_id = $0", userId).asFlow().map {
+
+        val user = realm.query<Models.UserInfo>("userId = $0", userId).asFlow().map {
             it.list.firstOrNull()
         }
 
@@ -66,7 +85,7 @@ class RealmRepo {
             if (appService.currentUser != null) {
                 val userId = appService.currentUser!!.id
                 realm.write {
-                    var user = query<Models.UserInfo>("_id = $0", userId).first().find()
+                    var user = query<Models.UserInfo>("userId = $0", userId).first().find()
                     if (user != null) {
                         user = findLatest(user)!!.also {
                             it.name = name
@@ -94,20 +113,19 @@ class RealmRepo {
     }
 
     suspend fun addProject(name: String, location: String, variety: String, data: String) {
-        withContext(Dispatchers.Default) {
-            realm.write {
-                val userId = appService.currentUser!!.id
+        realm.write {
+            val userId = appService.currentUser!!.id
 
-                val newProject = Models.Projects().apply {
-                    this.name = name
-                    this.location = location
-                    this.variety = variety
-                    this.data = data
-                    this.userId = userId // add the user object to the labeled image
-                }
-                copyToRealm(newProject)
+            val newProject = Models.Projects().apply {
+                this._id = ObjectId.create()
+                this.name = name
+                this.location = location
+                this.variety = variety
+                this.data = data
+                this.userId = userId
+
             }
+            copyToRealm(newProject)
         }
     }
-
 }
