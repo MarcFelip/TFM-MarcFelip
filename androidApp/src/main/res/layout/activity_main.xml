@@ -19,6 +19,17 @@
       app:layout_constraintTop_toTopOf="parent" >
   </ImageButton>
 
+  <ImageButton
+      android:id="@+id/btn_home"
+      android:layout_width="50dp"
+      android:layout_height="50dp"
+      android:layout_marginTop="25dp"
+      android:layout_marginStart="25dp"
+      android:background="@drawable/home"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" >
+  </ImageButton>
+
   <TextView
       android:id="@+id/textView"
       android:layout_width="wrap_content"
@@ -36,7 +47,7 @@
       android:id="@+id/btn_new_project"
       android:layout_width="180dp"
       android:layout_height="wrap_content"
-      android:layout_marginBottom="52dp"
+      android:layout_marginBottom="40dp"
       android:background="@drawable/signin_btn"
       android:text="@string/new_project"
       android:textAllCaps="false"
@@ -49,7 +60,7 @@
   <androidx.recyclerview.widget.RecyclerView
       android:id="@+id/projets_recyclerView"
       android:layout_width="match_parent"
-      android:layout_height="400dp"
+      android:layout_height="450dp"
       android:layout_marginTop="44dp"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"

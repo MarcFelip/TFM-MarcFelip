@@ -6,19 +6,21 @@ import android.content.Intent
 import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.MediaStore
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.Toast
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.customview.customView
-import com.google.android.material.textfield.TextInputEditText
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.jetbrains.androidApp.R
 import com.jetbrains.kmm.androidApp.addProject.AddProjectActivity
+import com.jetbrains.kmm.androidApp.main.adapter.ProjectAdapter
 import com.jetbrains.kmm.androidApp.profile.ProfileActivity
+import com.jetbrains.kmm.shared.Models
 
 
 class MainActivity : AppCompatActivity() {
@@ -28,9 +30,8 @@ class MainActivity : AppCompatActivity() {
     private var image: Bitmap? = null
     private lateinit var final_image: Bitmap
 
-    private val viewModel: MainViewModel by lazy {
-        ViewModelProvider(this)[MainViewModel::class.java]
-    }
+    private lateinit var viewModel: MainViewModel
+    private lateinit var projectsAdapter: ProjectAdapter
 
 
     @SuppressLint("MissingInflatedId")
@@ -41,6 +42,8 @@ class MainActivity : AppCompatActivity() {
         val user_button: ImageButton = findViewById(R.id.btn_profile)
         val new_project_button: Button = findViewById(R.id.btn_new_project)
 
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+
         user_button.setOnClickListener{
             val intent = Intent(this@MainActivity, ProfileActivity::class.java)
             startActivity(intent)
@@ -50,7 +53,20 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this@MainActivity, AddProjectActivity::class.java)
             startActivity(intent)
         }
+
+        lifecycleScope.launch{
+            initRecyclerView()
+        }
+
     }
 
+    private suspend fun initRecyclerView(){
+
+        val loadedProjects = viewModel.loadProjects()
+
+        val recyclerView = findViewById<RecyclerView>(R.id.projets_recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = ProjectAdapter(loadedProjects)
+    }
 
 }

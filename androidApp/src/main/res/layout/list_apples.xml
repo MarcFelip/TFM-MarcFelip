@@ -45,7 +45,7 @@
                 android:layout_marginLeft="4dp"
                 android:layout_toRightOf="@id/icon_IV">
                 <TextView
-                    android:id="@+id/project_name"
+                    android:id="@+id/apple_id"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="2dp"
@@ -62,6 +62,7 @@
                     />
 
                 <TextView
+                    android:id="@+id/apple_size"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/size"

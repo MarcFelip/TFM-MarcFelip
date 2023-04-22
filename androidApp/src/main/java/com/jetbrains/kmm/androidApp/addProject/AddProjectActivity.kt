@@ -29,6 +29,7 @@ class AddProjectActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this).get(AddProjectViewModel::class.java)
 
         val user_button: ImageButton = findViewById(R.id.btn_profile)
+        val home_button: ImageButton = findViewById(R.id.btn_home)
         val cancel_button: Button = findViewById(R.id.btn_cancel)
         val create_button: Button = findViewById(R.id.btn_create)
         val name: EditText = findViewById(R.id.name_project)
@@ -38,6 +39,11 @@ class AddProjectActivity : AppCompatActivity() {
 
         user_button.setOnClickListener{
             val intent = Intent(this@AddProjectActivity, ProfileActivity::class.java)
+            startActivity(intent)
+        }
+
+        home_button.setOnClickListener{
+            val intent = Intent(this@AddProjectActivity, MainActivity::class.java)
             startActivity(intent)
         }
 

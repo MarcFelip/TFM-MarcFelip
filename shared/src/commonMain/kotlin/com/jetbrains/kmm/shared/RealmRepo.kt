@@ -8,12 +8,10 @@ import io.realm.kotlin.mongodb.AppConfiguration
 import io.realm.kotlin.mongodb.Credentials
 import io.realm.kotlin.mongodb.User
 import io.realm.kotlin.mongodb.sync.SyncConfiguration
+import io.realm.kotlin.query.RealmResults
 import io.realm.kotlin.types.ObjectId
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 
 class RealmRepo {
     private val schemaClass = setOf(Models.UserInfo::class, Models.MeasuredImages::class, Models.Projects::class)
@@ -28,8 +26,9 @@ class RealmRepo {
         val user = appService.currentUser!!
         val config =
             SyncConfiguration.Builder(user, schemaClass)
-                .initialSubscriptions { realm ->
+                .initialSubscriptions(rerunOnOpen = true) { realm ->
                     add(realm.query<Models.UserInfo>(), name = "user info", updateExisting = true)
+                    add(realm.query<Models.Projects>(), name= "projects")
                 }.waitForInitialRemoteData().build()
         Realm.open(config)
     }
@@ -109,6 +108,21 @@ class RealmRepo {
                 }
                 copyToRealm(labeledImage)
             }
+        }
+    }
+
+    suspend fun getUserProjects(): List<Models.Projects> {
+        val userId = appService.currentUser!!.id
+        val projectsFlow = realm.query<Models.Projects>("userId = $0", userId).asFlow().map {
+            it.list
+        }
+
+        return try {
+            val projectsList = projectsFlow.first()  { it.isNotEmpty() }
+            projectsList
+        } catch (e: NoSuchElementException) {
+            // Return empty list if no matching element found
+            emptyList()
         }
     }
 

@@ -14,6 +14,7 @@ import com.afollestad.materialdialogs.customview.customView
 import com.google.android.material.textfield.TextInputEditText
 import com.jetbrains.androidApp.R
 import com.jetbrains.kmm.androidApp.login.LoginActivity
+import com.jetbrains.kmm.androidApp.main.MainActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -34,6 +35,12 @@ class ProfileActivity : AppCompatActivity() {
         val edit_button: TextView = findViewById(R.id.edit_profile_button)
         val password_button: TextView = findViewById(R.id.change_password_button)
         val logout_button: ImageButton = findViewById(R.id.logout)
+        val home_button: ImageButton = findViewById(R.id.btn_home)
+
+        home_button.setOnClickListener{
+            val intent = Intent(this@ProfileActivity, MainActivity::class.java)
+            startActivity(intent)
+        }
 
         viewModel = ViewModelProvider(this).get(ProfileViewModel::class.java)
 
@@ -94,23 +101,5 @@ class ProfileActivity : AppCompatActivity() {
 
         dialog.show()
     }
-
-
-
-    @Composable
-    fun get_data (): Pair <String, String> {
-        val profileVM: ProfileViewModel = viewModel()
-
-        var name: String = ""
-        var email: String = ""
-        profileVM.userInfo.observeAsState().apply {
-            this.value?.let {
-                name = it.name.toString()
-                email = it.email.toString()
-            }
-        }
-        return Pair(name, email)
-    }
-
 
 }

@@ -1,18 +1,35 @@
 package com.jetbrains.kmm.androidApp.main
 
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.lifecycle.*
+import com.jetbrains.kmm.shared.Models
 import com.jetbrains.kmm.shared.RealmRepo
+import io.realm.kotlin.query.RealmResults
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 
-public class MainViewModel : ViewModel() {
+class MainViewModel : ViewModel() {
     private val repo: RealmRepo = RealmRepo()
 
-    private val _loginStatus = MutableLiveData<Boolean>()
-    val loginStatus: LiveData<Boolean> = _loginStatus
+    suspend fun loadProjects(): List<Projects> {
+        return try {
+            val userProjects = repo.getUserProjects()
+            userProjects.map { project ->
+                Projects(
+                    name = project.name ?: "",
+                    data = project.data ?: ""
+                )
+            }
+        } catch (e: Exception) {
+            Log.e("MainViewModel", "Error al cargar proyectos: ${e.message}")
+            emptyList()
+        }
 
-    val alreadyLoggedIn: LiveData<Boolean> = repo.isUserLoggedIn().asLiveData(Dispatchers.Main)
+    }
+
 
     suspend fun addLabeledImage(image: Bitmap, size: String): Boolean {
         return try {

@@ -20,10 +20,16 @@ class ProjectActivity : AppCompatActivity() {
         setContentView(R.layout.activity_project_screen)
 
         val user_button: ImageButton = findViewById(R.id.btn_profile)
+        val home_button: ImageButton = findViewById(R.id.btn_home)
         val add_image: Button = findViewById(R.id.btn_add_img)
 
         user_button.setOnClickListener{
             val intent = Intent(this@ProjectActivity, ProfileActivity::class.java)
+            startActivity(intent)
+        }
+
+        home_button.setOnClickListener{
+            val intent = Intent(this@ProjectActivity, MainActivity::class.java)
             startActivity(intent)
         }
 
