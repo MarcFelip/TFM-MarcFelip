@@ -14,21 +14,23 @@ import java.io.ByteArrayOutputStream
 class MainViewModel : ViewModel() {
     private val repo: RealmRepo = RealmRepo()
 
-    suspend fun loadProjects(): List<Projects> {
+    suspend fun loadProjects(): List<Models.Projects> {
         return try {
-            val userProjects = repo.getUserProjects()
-            userProjects.map { project ->
-                Projects(
-                    name = project.name ?: "",
-                    data = project.data ?: ""
-                )
-            }
+            repo.getUserProjects()
         } catch (e: Exception) {
             Log.e("MainViewModel", "Error al cargar proyectos: ${e.message}")
             emptyList()
         }
-
     }
+
+    /*suspend fun loadActualProject(userId: String, name: String, data: String): List<Models.Projects> {
+        return try {
+            repo.getActualProject(userId, name, data)
+        } catch (e: Exception) {
+            Log.e("MainViewModel", "Error al cargar proyectos: ${e.message}")
+            emptyList()
+        }
+    }*/
 
 
     suspend fun addLabeledImage(image: Bitmap, size: String): Boolean {

@@ -58,6 +58,15 @@ class AddProjectActivity : AppCompatActivity() {
 
                 if (addSucces) {
                     val intent = Intent(this@AddProjectActivity, ProjectActivity::class.java)
+                    val bundle = Bundle().apply {
+                        putString("name", name_str)
+                        putString("data", data_str)
+                        putString("userId", viewModel.getId())
+                        putString("location", location_str)
+                        putString("variety", variety_str)
+                    }
+
+                    intent.putExtras(bundle)
                     startActivity(intent)
                 } else {
                     Toast.makeText(

@@ -22,17 +22,29 @@ class Models {
         var project_id: String? = null
         var size: Float? = null
         var appleImage: ByteArray? = null
-        var measurementId: String? = null
+        var imageId: String? = null
+        var userId: String? = ""
     }
 
     class Projects : RealmObject {
         @PrimaryKey
         var _id: ObjectId = ObjectId.create()
+        var projectId: String = ""
         var name: String? = null
         var location: String? = null
         var variety: String? = null
         var data: String? = null
         //var userId: String? = null
+        var userId: String? = ""
+    }
+
+    class AppleImages : RealmObject {
+        @PrimaryKey
+        var _id: ObjectId = ObjectId.create()
+        var project_id: String? = null
+        var size: Float? = null
+        var appleImage: String? = null
+        var imageId: String? = null
         var userId: String? = ""
     }
 

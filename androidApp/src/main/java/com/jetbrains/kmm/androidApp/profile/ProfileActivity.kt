@@ -23,7 +23,9 @@ import kotlinx.coroutines.withContext
 class ProfileActivity : AppCompatActivity() {
 
     private lateinit var viewModel: ProfileViewModel
-    //private val viewModel = ViewModelProvider(this).get(ProfileViewModel::class.java)
+
+    private lateinit var db_name: String
+    private lateinit var db_email: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +39,8 @@ class ProfileActivity : AppCompatActivity() {
         val logout_button: ImageButton = findViewById(R.id.logout)
         val home_button: ImageButton = findViewById(R.id.btn_home)
 
+
+
         home_button.setOnClickListener{
             val intent = Intent(this@ProfileActivity, MainActivity::class.java)
             startActivity(intent)
@@ -47,6 +51,9 @@ class ProfileActivity : AppCompatActivity() {
         viewModel.getProfileData().observe(this) { (user_name_db, user_email_db) ->
             user_name.text = user_name_db
             user_email.text = user_email_db
+
+           db_name = user_name_db
+           db_email = user_email_db
         }
 
         logout_button.setOnClickListener {
@@ -77,6 +84,14 @@ class ProfileActivity : AppCompatActivity() {
         val btn_cancel = dialog.findViewById<Button>(R.id.btn_cancel)
         val name_value = dialog.findViewById<EditText>(R.id.username)
         val email_value = dialog.findViewById<EditText>(R.id.email)
+
+        if (db_name != null || db_name != ""){
+            name_value.setHint(db_name)
+        }
+        if (db_email != null || db_email != ""){
+            email_value.setHint(db_email)
+        }
+
 
         btn_save.setOnClickListener{
             lifecycleScope.launch {

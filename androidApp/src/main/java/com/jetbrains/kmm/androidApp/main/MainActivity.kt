@@ -20,10 +20,11 @@ import com.jetbrains.androidApp.R
 import com.jetbrains.kmm.androidApp.addProject.AddProjectActivity
 import com.jetbrains.kmm.androidApp.main.adapter.ProjectAdapter
 import com.jetbrains.kmm.androidApp.profile.ProfileActivity
+import com.jetbrains.kmm.androidApp.project.ProjectActivity
 import com.jetbrains.kmm.shared.Models
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ProjectAdapter.onClickListener {
 
     private val CAMERA_REQUEST_CODE = 1
     private lateinit var image_view: ImageView
@@ -32,6 +33,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: MainViewModel
     private lateinit var projectsAdapter: ProjectAdapter
+    private var loadedProjects: List<Models.Projects> = emptyList()
 
 
     @SuppressLint("MissingInflatedId")
@@ -62,11 +64,38 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun initRecyclerView(){
 
-        val loadedProjects = viewModel.loadProjects()
+        loadedProjects = viewModel.loadProjects()
+
+        val listProjects = loadedProjects.map { project ->
+            Projects(
+                name = project.name ?: "",
+                data = project.data ?: ""
+            )
+        }
 
         val recyclerView = findViewById<RecyclerView>(R.id.projets_recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = ProjectAdapter(loadedProjects)
+        recyclerView.adapter = ProjectAdapter(listProjects, this@MainActivity)
     }
+
+    override fun onClick(position: Int) {
+        val project_show = loadedProjects[position]
+
+        val intent = Intent(this@MainActivity, ProjectActivity::class.java)
+
+        val bundle = Bundle().apply {
+            //putString("projectId", project_show._id.toString())
+            putString("projectId", project_show.projectId.toString())
+            putString("name", project_show.name.toString())
+            putString("data", project_show.data.toString())
+            putString("userId", project_show.userId.toString())
+            putString("location", project_show.location.toString())
+            putString("variety", project_show.variety.toString())
+        }
+
+        intent.putExtras(bundle)
+        startActivity(intent)
+    }
+
 
 }

@@ -36,7 +36,7 @@
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <ImageView
-                android:id="@+id/imageView"
+                android:id="@+id/imageViewApple"
                 android:layout_width="169dp"
                 android:layout_height="166dp"
                 android:layout_marginTop="28dp"
@@ -56,7 +56,7 @@
                 android:text="@string/select_image"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/imageView" />
+                app:layout_constraintTop_toBottomOf="@+id/imageViewApple" />
 
             <LinearLayout
                 android:id="@+id/linearLayout"
@@ -85,7 +85,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.498"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView" />
+                    app:layout_constraintTop_toBottomOf="@+id/textView_pname" />
             </LinearLayout>
 
             <LinearLayout
@@ -115,7 +115,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.498"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView" />
+                    app:layout_constraintTop_toBottomOf="@+id/textView_pname" />
             </LinearLayout>
 
             <Button

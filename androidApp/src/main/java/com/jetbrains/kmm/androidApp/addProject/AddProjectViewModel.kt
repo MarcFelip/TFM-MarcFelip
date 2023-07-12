@@ -11,7 +11,9 @@ public class AddProjectViewModel : ViewModel() {
     private val _added = MutableLiveData<Boolean>()
     val added: LiveData<Boolean> = _added
 
-
+    fun getId(): String{
+        return repo.getuserId()
+    }
     suspend fun addProject(name: String, location: String, variety: String, data: String): Boolean {
         return try {
             repo.addProject(name, location, variety, data)
