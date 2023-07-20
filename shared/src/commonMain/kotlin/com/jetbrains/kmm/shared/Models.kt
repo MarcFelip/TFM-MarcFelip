@@ -43,7 +43,8 @@ class Models {
         var _id: ObjectId = ObjectId.create()
         var project_id: String? = null
         var size: Float? = null
-        var appleImage: String? = null
+        //var appleImage: String? = null
+        var appleImage: ByteArray? = null
         var imageId: String? = null
         var userId: String? = ""
     }

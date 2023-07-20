@@ -20,7 +20,7 @@ class RealmRepo {
 
     private val appService by lazy {
         val appConfiguration =
-            AppConfiguration.Builder(appId = "tfmmarcfelip-vytmb").log(LogLevel.ALL).build()
+            AppConfiguration.Builder(appId = "apple-size-tdifc").log(LogLevel.ALL).build()
         App.create(appConfiguration)
     }
 
@@ -32,7 +32,7 @@ class RealmRepo {
                     add(realm.query<Models.UserInfo>(), name = "user info", updateExisting = true)
                     add(realm.query<Models.Projects>(), name= "projects")
                     add(realm.query<Models.MeasuredImages>(), name= "measured images")
-                    add(realm.query<Models.MeasuredImages>(), name= "apple images")
+                    add(realm.query<Models.AppleImages>(), name= "apple images")
                 }.waitForInitialRemoteData().build()
         Realm.open(config)
     }
@@ -183,7 +183,8 @@ class RealmRepo {
         }
     }
 
-    suspend fun addImage(projectId: String, size: Float, appleImage: String) {
+    suspend fun addImage(projectId: String, size: Float, appleImage: ByteArray) {
+    //suspend fun addImage(projectId: String, size: Float, appleImage: String) {
         realm.write {
             val id  = createObjectIdString()
             val userId = appService.currentUser!!.id

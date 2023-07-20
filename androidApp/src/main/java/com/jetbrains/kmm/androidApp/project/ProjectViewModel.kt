@@ -17,6 +17,24 @@ public class ProjectViewModel : ViewModel() {
 
     suspend fun addLabeledImage(image: Bitmap, size: String, projectId: String): Boolean {
         return try {
+            val byteArrayOutputStream = ByteArrayOutputStream()
+            image.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+            val byteArray = byteArrayOutputStream.toByteArray()
+
+            val float_size = size.toFloat()
+
+            repo.addImage(projectId, float_size, byteArray)
+
+            _addStatus.postValue(true)
+            true
+        } catch (e: Exception) {
+            _addStatus.postValue(false)
+            false
+        }
+    }
+
+    /*suspend fun addLabeledImage(image: Bitmap, size: String, projectId: String): Boolean {
+        return try {
             //val outputStream = ByteArrayOutputStream()
 
 //            image.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
@@ -38,5 +56,5 @@ public class ProjectViewModel : ViewModel() {
             _addStatus.postValue(false)
             false
         }
-    }
+    }*/
 }
