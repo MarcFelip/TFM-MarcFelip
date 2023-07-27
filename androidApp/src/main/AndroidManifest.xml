@@ -11,7 +11,7 @@
         android:theme="@style/AppTheme"
         android:enableOnBackInvokedCallback="true">
         <activity
-            android:name="com.jetbrains.kmm.androidApp.login.LoginActivity"
+            android:name="com.jetbrains.kmm.androidApp.main.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.jetbrains.kmm.androidApp.main.MainActivity"/>
+        <activity android:name="com.jetbrains.kmm.androidApp.login.LoginActivity"/>
         <activity android:name="com.jetbrains.kmm.androidApp.register.RegisterActivity"/>
         <activity android:name="com.jetbrains.kmm.androidApp.profile.ProfileActivity"/>
         <activity android:name="com.jetbrains.kmm.androidApp.project.ProjectActivity"/>

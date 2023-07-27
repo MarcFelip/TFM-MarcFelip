@@ -29,7 +29,7 @@
     </ImageButton>
 
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profile_image"
         android:layout_width="175dp"
         android:layout_height="175dp"

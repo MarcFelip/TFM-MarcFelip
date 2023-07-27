@@ -12,18 +12,7 @@ class Models {
         var userId: String = ""
         var name: String? = null
         var email: String? = null
-        var isAdmin: Boolean? = null
-        var image: String? = null
-    }
-
-    class MeasuredImages : RealmObject {
-        @PrimaryKey
-        var _id: ObjectId = ObjectId.create()
-        var project_id: String? = null
-        var size: Float? = null
-        var appleImage: ByteArray? = null
-        var imageId: String? = null
-        var userId: String? = ""
+        var userImage: ByteArray? = null
     }
 
     class Projects : RealmObject {
@@ -34,7 +23,6 @@ class Models {
         var location: String? = null
         var variety: String? = null
         var data: String? = null
-        //var userId: String? = null
         var userId: String? = ""
     }
 
@@ -43,7 +31,6 @@ class Models {
         var _id: ObjectId = ObjectId.create()
         var project_id: String? = null
         var size: Float? = null
-        //var appleImage: String? = null
         var appleImage: ByteArray? = null
         var imageId: String? = null
         var userId: String? = ""

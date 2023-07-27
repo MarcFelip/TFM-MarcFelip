@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:background="@color/black">
@@ -9,7 +9,7 @@
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/ccTrip"
         android:layout_width="400dp"
-        android:layout_height="640dp"
+        android:layout_height="600dp"
         app:cardCornerRadius="24dp"
         app:cardElevation="2dp"
         android:background="@drawable/background"
@@ -28,59 +28,28 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="25dp"
-                android:text="@string/edit"
+                android:text="@string/edit_project"
                 android:textSize="32sp"
                 android:textColor="@color/text_color"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/imageViewUser"
-                android:layout_width="169dp"
-                android:layout_height="166dp"
-                android:layout_marginTop="28dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/title"
-                tools:srcCompat="@tools:sample/avatars" />
-
-
-            <Button
-                android:id="@+id/take_photo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginVertical="10dp"
-                android:background="@android:color/transparent"
-                android:gravity="center"
-                android:paddingVertical="16dp"
-                android:text="@string/select_image"
-                android:textColor="@color/text_color"
-                android:visibility="visible"
-                app:cornerRadius="16dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/imageViewUser"
-                app:layout_constraintVertical_bias="0.05"
-                app:rippleColor="#33AAAAAA"
-                app:strokeColor="@color/black" />
 
             <LinearLayout
                 android:id="@+id/linearLayout"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="50dp"
                 android:background="@drawable/login_card"
                 android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.497"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/take_photo">
+                app:layout_constraintTop_toBottomOf="@+id/title">
 
                 <EditText
-                    android:id="@+id/username"
+                    android:id="@+id/name_project_dialog"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:layout_marginStart="10dp"
@@ -89,12 +58,12 @@
                     android:layout_marginBottom="1dp"
                     android:background="@color/white"
                     android:ems="10"
-                    android:hint="@string/username"
+                    android:hint="@string/project_name"
                     android:inputType="text"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.498"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView_pname" />
+                    app:layout_constraintTop_toBottomOf="@+id/title" />
             </LinearLayout>
 
             <LinearLayout
@@ -110,7 +79,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
                 <EditText
-                    android:id="@+id/email"
+                    android:id="@+id/location_dialog"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:layout_marginStart="10dp"
@@ -119,23 +88,83 @@
                     android:layout_marginBottom="1dp"
                     android:background="@color/white"
                     android:ems="10"
-                    android:hint="@string/email"
+                    android:hint="@string/location"
                     android:inputType="text"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.498"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView_pname"
-                    tools:ignore="TextFields" />
+                    app:layout_constraintTop_toBottomOf="@+id/title" />
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/linearLayout3"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:background="@drawable/login_card"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.497"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
+
+                <EditText
+                    android:id="@+id/variety_dialog"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="1dp"
+                    android:background="@color/white"
+                    android:ems="10"
+                    android:hint="@string/variety"
+                    android:inputType="text"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.498"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/title" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout4"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:background="@drawable/login_card"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.497"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
+
+                <EditText
+                    android:id="@+id/data_dialog"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="1dp"
+                    android:background="@color/white"
+                    android:ems="10"
+                    android:hint="@string/data"
+                    android:inputType="text"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.498"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/title" />
+            </LinearLayout>
+
+
             <Button
-                android:id="@+id/btn_save_profile"
+                android:id="@+id/btn_save"
                 android:layout_width="120dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
                 android:layout_marginEnd="40dp"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="20dp"
                 android:gravity="center"
                 android:paddingVertical="16dp"
                 android:text="@string/save"
@@ -145,7 +174,7 @@
                 app:cornerRadius="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout4" />
 
             <Button
                 android:id="@+id/btn_cancel"
@@ -164,7 +193,19 @@
                 app:cornerRadius="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout4"
+                app:layout_constraintVertical_bias="0.515" />
+
+            <ImageButton
+                android:id="@+id/btn_delete"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="25dp"
+                android:layout_marginEnd="25dp"
+                android:background="@drawable/trash_icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" >
+            </ImageButton>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>

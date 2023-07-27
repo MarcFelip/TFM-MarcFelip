@@ -2,23 +2,20 @@ package com.jetbrains.kmm.androidApp.register
 
 import androidx.lifecycle.*
 import com.jetbrains.kmm.shared.RealmRepo
-import kotlinx.coroutines.Dispatchers
 
-public class RegisterViewModel : ViewModel() {
+class RegisterViewModel : ViewModel() {
     private val repo: RealmRepo = RealmRepo()
 
     private val _loginStatus = MutableLiveData<Boolean>()
-    val loginStatus: LiveData<Boolean> = _loginStatus
 
-    val alreadyLoggedIn: LiveData<Boolean> = repo.isUserLoggedIn().asLiveData(Dispatchers.Main)
-
-    suspend fun registration(userName: String, password: String): Boolean {
+    //Call function from repo to register the new user
+    suspend fun registration(email: String, userName: String, password: String): Boolean {
         return try {
-            repo.registration(userName, password)
-            _loginStatus.postValue(true) // login successful
+            repo.registration(email, userName, password)
+            _loginStatus.postValue(true)
             true
         } catch (e: Exception) {
-            _loginStatus.postValue(false) // login failed
+            _loginStatus.postValue(false)
             false
         }
     }

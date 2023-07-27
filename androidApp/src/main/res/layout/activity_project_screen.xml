@@ -19,6 +19,7 @@
       app:layout_constraintTop_toTopOf="parent" >
   </ImageButton>
 
+
   <ImageButton
       android:id="@+id/btn_home"
       android:layout_width="50dp"
@@ -38,6 +39,16 @@
       android:layout_marginTop="34dp"
       android:background="@drawable/red_pen"
       app:layout_constraintStart_toEndOf="@+id/textView_pname"
+      app:layout_constraintTop_toBottomOf="@+id/btn_profile" />
+
+  <ImageButton
+      android:id="@+id/btn_histogram"
+      android:layout_width="30dp"
+      android:layout_height="30dp"
+      android:layout_marginStart="10dp"
+      android:layout_marginTop="34dp"
+      android:background="@drawable/histogram"
+      app:layout_constraintStart_toEndOf="@+id/btn_edit_project"
       app:layout_constraintTop_toBottomOf="@+id/btn_profile" />
 
   <TextView

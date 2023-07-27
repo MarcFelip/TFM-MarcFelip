@@ -32,5 +32,15 @@
     <string name="old_password">Old Password</string>
     <string name="new_password">New Password</string>
     <string name="repeat_password">Repeat Password</string>
+    <string name="calibrate_camera">Calibrate Camera</string>
+    <string name="calibrate_button_text">Calibrate</string>
+    <string name="calibrate_text">Do you want to calibrate the camera?      If you wish, you will have to take 5 photos and manually enter the size of the fruit.</string>
+    <string name="delete_image">Delete Image</string>
+    <string name="delete_project">Delete Project</string>
+    <string name="delete">Delete</string>
+    <string name="delete_image_text">Are you sure you want to delete the image? Once deleted, it cannot be recovered.</string>
+    <string name="delete_project_text">Are you sure you want to delete the project? Once deleted, it cannot be recovered.</string>
+    <string name="edit_project">Edit Project</string>
+    <string name="no">No</string>
 
 </resources>

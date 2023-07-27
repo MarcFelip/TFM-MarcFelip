@@ -1,60 +1,61 @@
 package com.jetbrains.kmm.androidApp.profile
 
+import android.graphics.Bitmap
 import androidx.lifecycle.*
 import com.jetbrains.kmm.shared.Models
 import com.jetbrains.kmm.shared.RealmRepo
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 
 class ProfileViewModel : ViewModel(){
     private val repo = RealmRepo()
 
-    private val viewModelScope = CoroutineScope(Dispatchers.IO)
-
+    //Call function from repo to logout
     suspend fun doLogout() {
         withContext(Dispatchers.IO) {
             repo.doLogout()
         }
     }
 
-    val userInfo: LiveData<Models.UserInfo?> = liveData {
-        emitSource(repo.getUserProfile().flowOn(Dispatchers.IO).asLiveData(Dispatchers.Main))
-    }
-
-
-    fun getProfileData (): LiveData<Pair<String, String>> {
-
-        val result = MutableLiveData<Pair<String, String>>()
+    //Call function from repo to get the user data
+    fun getProfileData(): LiveData<Triple<String, String, ByteArray?>> {
+        val result = MutableLiveData<Triple<String, String, ByteArray?>>()
 
         val userInfo: LiveData<Models.UserInfo?> = liveData {
             emitSource(repo.getUserProfile().flowOn(Dispatchers.IO).asLiveData(Dispatchers.Main))
         }
 
         userInfo.observeForever { userInfo ->
-            val user_name_db = userInfo?.name.toString()
-            val user_email_db = userInfo?.email.toString()
-            result.postValue(Pair(user_name_db, user_email_db))
+            val userNameDb = userInfo?.name.toString()
+            val userEmailDb = userInfo?.email.toString()
+            val userImageByteArray = userInfo?.userImage
+            result.postValue(Triple(userNameDb, userEmailDb, userImageByteArray))
         }
-        //val user_name_db = userInfo.value?.name.toString()
-        //val user_email_db = userInfo.value?.email.toString()
 
         return result
     }
 
-    suspend fun updateProfile(name: String, email: String): Boolean {
-        try {
-            repo.editProfile(name, email)
 
-            return true
-        }catch (e: Exception) {
-            return false
+
+    //Call function from repo to update user info
+    suspend fun updateProfile(image: Bitmap?, name: String, email: String): Boolean {
+        return try {
+            val byteArray: ByteArray? = if (image != null) {
+                val byteArrayOutputStream = ByteArrayOutputStream()
+                image.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+                byteArrayOutputStream.toByteArray()
+            } else {
+                null
+            }
+
+            repo.editProfile(name, email, byteArray)
+
+            true
+        } catch (e: Exception) {
+            false
         }
-
     }
-
-    //// Reload the user info from the database to update the UI
-    //                    userInfo.value = repo.getUserProfile().first()
 
 }

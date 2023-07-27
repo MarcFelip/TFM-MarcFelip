@@ -15,8 +15,6 @@ import com.jetbrains.androidApp.R
 import com.jetbrains.kmm.androidApp.main.MainActivity
 import com.jetbrains.kmm.androidApp.profile.ProfileActivity
 import com.jetbrains.kmm.androidApp.project.ProjectActivity
-import com.jetbrains.kmm.androidApp.addProject.AddProjectViewModel
-import com.jetbrains.kmm.androidApp.profile.ProfileViewModel
 
 class AddProjectActivity : AppCompatActivity() {
 
@@ -26,44 +24,45 @@ class AddProjectActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_project)
 
-        viewModel = ViewModelProvider(this).get(AddProjectViewModel::class.java)
+        viewModel = ViewModelProvider(this)[AddProjectViewModel::class.java]
 
-        val user_button: ImageButton = findViewById(R.id.btn_profile)
-        val home_button: ImageButton = findViewById(R.id.btn_home)
-        val cancel_button: Button = findViewById(R.id.btn_cancel)
-        val create_button: Button = findViewById(R.id.btn_create)
+        val userButton: ImageButton = findViewById(R.id.btn_profile)
+        val homeButton: ImageButton = findViewById(R.id.btn_home)
+        val cancelButton: Button = findViewById(R.id.btn_cancel)
+        val createButton: Button = findViewById(R.id.btn_create)
         val name: EditText = findViewById(R.id.name_project)
         val location: EditText = findViewById(R.id.location)
         val variety: EditText = findViewById(R.id.variety)
         val data: EditText = findViewById(R.id.data)
 
-        user_button.setOnClickListener{
+        userButton.setOnClickListener{
             val intent = Intent(this@AddProjectActivity, ProfileActivity::class.java)
             startActivity(intent)
         }
 
-        home_button.setOnClickListener{
+        homeButton.setOnClickListener{
             val intent = Intent(this@AddProjectActivity, MainActivity::class.java)
             startActivity(intent)
         }
 
-        create_button.setOnClickListener{
+        createButton.setOnClickListener{
             lifecycleScope.launch {
-                val name_str = name.text.toString()
-                val location_str = location.text.toString()
-                val variety_str = variety.text.toString()
-                val data_str = data.text.toString()
+                val nameStr = name.text.toString()
+                val locationStr = location.text.toString()
+                val varietyStr = variety.text.toString()
+                val dataStr = data.text.toString()
 
-                val addSucces = viewModel.addProject(name_str, location_str, variety_str, data_str)
+                val projectId = viewModel.addProject(nameStr, locationStr, varietyStr, dataStr)
 
-                if (addSucces) {
+                if (projectId != null) {
                     val intent = Intent(this@AddProjectActivity, ProjectActivity::class.java)
                     val bundle = Bundle().apply {
-                        putString("name", name_str)
-                        putString("data", data_str)
+                        putString("name", nameStr)
+                        putString("data", dataStr)
                         putString("userId", viewModel.getId())
-                        putString("location", location_str)
-                        putString("variety", variety_str)
+                        putString("location", locationStr)
+                        putString("variety", varietyStr)
+                        putString("projectId", projectId)
                     }
 
                     intent.putExtras(bundle)
@@ -77,12 +76,9 @@ class AddProjectActivity : AppCompatActivity() {
             }
         }
 
-        cancel_button.setOnClickListener{
+        cancelButton.setOnClickListener{
             val intent = Intent(this@AddProjectActivity, MainActivity::class.java)
             startActivity(intent)
         }
-
     }
-
-
 }

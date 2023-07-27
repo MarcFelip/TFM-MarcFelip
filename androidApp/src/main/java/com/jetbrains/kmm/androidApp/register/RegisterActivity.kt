@@ -9,6 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.textfield.TextInputLayout
 import com.jetbrains.androidApp.R
 import com.jetbrains.kmm.androidApp.login.LoginActivity
 import com.jetbrains.kmm.androidApp.main.MainActivity
@@ -20,16 +21,19 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
-        val register_button: Button = findViewById(R.id.register)
-        val login_button: TextView = findViewById(R.id.login)
+        val registerButton: Button = findViewById(R.id.register)
+        val loginButton: TextView = findViewById(R.id.login)
         val username: EditText = findViewById(R.id.username)
+        val email: EditText = findViewById(R.id.email)
         val password: EditText = findViewById(R.id.password)
+        val passwordLayout: TextInputLayout = findViewById(R.id.passwordLayout)
+        passwordLayout.isEndIconVisible = true
 
         val viewModel = ViewModelProvider(this)[RegisterViewModel::class.java] as RegisterViewModel
 
-        register_button.setOnClickListener {
+        registerButton.setOnClickListener {
             lifecycleScope.launch {
-                val registerSuccess = viewModel.registration(username.text.toString(), password.text.toString())
+                val registerSuccess = viewModel.registration(email.text.toString(), username.text.toString(), password.text.toString())
 
                 if (registerSuccess) {
                     val intent = Intent(this@RegisterActivity, MainActivity::class.java)
@@ -40,7 +44,7 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
-        login_button.setOnClickListener {
+        loginButton.setOnClickListener {
 
             val intent = Intent(this@RegisterActivity, LoginActivity::class.java)
             startActivity(intent)

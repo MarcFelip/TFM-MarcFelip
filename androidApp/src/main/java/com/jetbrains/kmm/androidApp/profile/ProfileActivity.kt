@@ -1,17 +1,22 @@
 package com.jetbrains.kmm.androidApp.profile
 
+import android.app.Activity
+import android.app.Dialog
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.provider.MediaStore
+import android.view.ViewGroup
+import android.view.Window
 import android.widget.*
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.customview.customView
-import com.google.android.material.textfield.TextInputEditText
 import com.jetbrains.androidApp.R
 import com.jetbrains.kmm.androidApp.login.LoginActivity
 import com.jetbrains.kmm.androidApp.main.MainActivity
@@ -24,39 +29,48 @@ class ProfileActivity : AppCompatActivity() {
 
     private lateinit var viewModel: ProfileViewModel
 
-    private lateinit var db_name: String
-    private lateinit var db_email: String
+    private lateinit var dbName: String
+    private lateinit var dbEmail: String
+    private lateinit var imageBitmap: Bitmap
+    private lateinit var imageView: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
-        val user_img: ImageView = findViewById(R.id.profile_image)
-        val user_name: TextView = findViewById(R.id.user_name)
-        val user_email: TextView = findViewById(R.id.user_email)
-        val edit_button: TextView = findViewById(R.id.edit_profile_button)
-        val password_button: TextView = findViewById(R.id.change_password_button)
-        val logout_button: ImageButton = findViewById(R.id.logout)
-        val home_button: ImageButton = findViewById(R.id.btn_home)
+        val userImg: ImageView = findViewById(R.id.profile_image)
+        val userName: TextView = findViewById(R.id.user_name)
+        val userEmail: TextView = findViewById(R.id.user_email)
+        val editButton: TextView = findViewById(R.id.edit_profile_button)
+        val passwordButton: TextView = findViewById(R.id.change_password_button)
+        val logoutButton: ImageButton = findViewById(R.id.logout)
+        val homeButton: ImageButton = findViewById(R.id.btn_home)
 
-
-
-        home_button.setOnClickListener{
+        homeButton.setOnClickListener{
             val intent = Intent(this@ProfileActivity, MainActivity::class.java)
             startActivity(intent)
         }
 
-        viewModel = ViewModelProvider(this).get(ProfileViewModel::class.java)
+        viewModel = ViewModelProvider(this)[ProfileViewModel::class.java]
 
-        viewModel.getProfileData().observe(this) { (user_name_db, user_email_db) ->
-            user_name.text = user_name_db
-            user_email.text = user_email_db
+        viewModel.getProfileData().observe(this) { (userNameDb, userEmailDb, userImageByteArray) ->
+            userName.text = userNameDb
+            userEmail.text = userEmailDb
 
-           db_name = user_name_db
-           db_email = user_email_db
+            //Convert the received image as ByteArray to Bitmap
+            val userBitmap: Bitmap? = if (userImageByteArray != null) {
+                BitmapFactory.decodeByteArray(userImageByteArray, 0, userImageByteArray.size)
+            } else {
+                null
+            }
+
+            // Put the userImage in the ImageView
+            userImg.setImageBitmap(userBitmap)
+            dbName = userNameDb
+            dbEmail = userEmailDb
         }
 
-        logout_button.setOnClickListener {
+        logoutButton.setOnClickListener {
             lifecycleScope.launch {
                 viewModel.doLogout()
                 withContext(Dispatchers.Main) {
@@ -66,55 +80,89 @@ class ProfileActivity : AppCompatActivity() {
             }
         }
 
-        edit_button.setOnClickListener{
+        editButton.setOnClickListener{
             showProfileDialog()
         }
 
-        password_button.setOnClickListener{
+        passwordButton.setOnClickListener{
             showPasswordDialog()
         }
-
     }
 
-    private fun showProfileDialog(){
-        val dialog = MaterialDialog(this).noAutoDismiss()
-            .customView(R.layout.dialog_edit_profile)
-
-        val btn_save = dialog.findViewById<Button>(R.id.btn_save_profile)
-        val btn_cancel = dialog.findViewById<Button>(R.id.btn_cancel)
-        val name_value = dialog.findViewById<EditText>(R.id.username)
-        val email_value = dialog.findViewById<EditText>(R.id.email)
-
-        if (db_name != null || db_name != ""){
-            name_value.setHint(db_name)
+    // Request to get an image from the camera or gallery
+    private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val intent = result.data
+            imageBitmap = intent?.extras?.get("data") as Bitmap
+            imageView.setImageBitmap(imageBitmap)
         }
-        if (db_email != null || db_email != ""){
-            email_value.setHint(db_email)
+    }
+
+    //Dialog that allows editing the user profile
+    private fun showProfileDialog() {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.dialog_edit_profile)
+        dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setCancelable(true)
+
+        val btnSave = dialog.findViewById<Button>(R.id.btn_save_profile)
+        val btnCancel = dialog.findViewById<Button>(R.id.btn_cancel)
+        val nameValue = dialog.findViewById<EditText>(R.id.username)
+        val emailValue = dialog.findViewById<EditText>(R.id.email)
+        val btnCamera = dialog.findViewById<Button>(R.id.take_photo)
+
+        imageView = dialog.findViewById(R.id.imageViewUser)
+
+        nameValue.hint = dbName
+        emailValue.hint = dbEmail
+
+        btnCamera.setOnClickListener {
+            startForResult.launch(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
         }
 
-
-        btn_save.setOnClickListener{
+        btnSave.setOnClickListener {
             lifecycleScope.launch {
-
-                val editSuccess = viewModel.updateProfile(name_value.text.toString(), email_value.text.toString())
+                val editSuccess = viewModel.updateProfile(
+                    if (::imageBitmap.isInitialized) imageBitmap else null,
+                    nameValue.text.toString(),
+                    emailValue.text.toString()
+                )
 
                 if (editSuccess) {
                     dialog.dismiss()
-                }else{
+                } else {
                     Toast.makeText(this@ProfileActivity, "Error Editing Profile", Toast.LENGTH_SHORT).show()
-
                 }
             }
         }
 
-        dialog.show()
-    }
 
-    private fun showPasswordDialog(){
-        val dialog = MaterialDialog(this).noAutoDismiss()
-            .customView(R.layout.dialog_change_password)
+        btnCancel.setOnClickListener{
+            dialog.dismiss()
+        }
 
         dialog.show()
     }
 
+    //Dialog that allows to change the user password
+    private fun showPasswordDialog() {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.dialog_change_password)
+        dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setCancelable(true)
+
+        val btnSave = dialog.findViewById<Button>(R.id.btn_save_password)
+        val btnCancel = dialog.findViewById<Button>(R.id.btn_cancel)
+
+        btnCancel.setOnClickListener{
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
 }

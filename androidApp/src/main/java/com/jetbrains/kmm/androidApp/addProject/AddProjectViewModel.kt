@@ -2,27 +2,27 @@ package com.jetbrains.kmm.androidApp.addProject
 
 import androidx.lifecycle.*
 import com.jetbrains.kmm.shared.RealmRepo
-import kotlinx.coroutines.Dispatchers
-import java.io.ByteArrayOutputStream
 
-public class AddProjectViewModel : ViewModel() {
+class AddProjectViewModel : ViewModel() {
     private val repo: RealmRepo = RealmRepo()
-
     private val _added = MutableLiveData<Boolean>()
-    val added: LiveData<Boolean> = _added
 
+    //Get UserId from repo
     fun getId(): String{
         return repo.getuserId()
     }
-    suspend fun addProject(name: String, location: String, variety: String, data: String): Boolean {
+
+    //Call function from repo to add the new project
+    suspend fun addProject(name: String, location: String, variety: String, data: String): String? {
         return try {
-            repo.addProject(name, location, variety, data)
+            val id = repo.addProject(name, location, variety, data)
             _added.postValue(true)
-            true
+            id
         } catch (e: Exception) {
             _added.postValue(false)
-            false
+            null
         }
     }
+
 
 }
