@@ -24,7 +24,7 @@
             <ImageView
                 android:id="@+id/icon_IV"
                 android:layout_width="70dp"
-                android:layout_height="70dp"
+                android:layout_height="90dp"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_gravity="center"
@@ -39,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_marginStart="4dp"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="15dp"
                 android:layout_toEndOf="@id/icon_IV"
                 android:orientation="vertical"
                 android:layout_marginLeft="4dp"
@@ -48,7 +48,7 @@
                     android:id="@+id/apple_id"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="2dp"
+                    android:layout_marginBottom="5dp"
                     android:text="@string/id"
                     android:textColor="@color/black"
                     android:textSize="20sp">
@@ -66,6 +66,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/size"
+                    android:layout_marginTop="5dp"
                     android:textColor="@color/line"
                     android:textSize="18sp">
                 </TextView>

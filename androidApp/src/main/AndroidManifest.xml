@@ -1,15 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.jetbrains.androidApp">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
+
+    <uses-feature android:name="android.hardware.camera"
+        android:required="true" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
 
 
     <application
         android:allowBackup="false"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:enableOnBackInvokedCallback="true">
+        android:enableOnBackInvokedCallback="true"
+        tools:targetApi="tiramisu">
+
         <activity
             android:name="com.jetbrains.kmm.androidApp.main.MainActivity"
             android:exported="true">
@@ -24,6 +36,17 @@
         <activity android:name="com.jetbrains.kmm.androidApp.profile.ProfileActivity"/>
         <activity android:name="com.jetbrains.kmm.androidApp.project.ProjectActivity"/>
         <activity android:name="com.jetbrains.kmm.androidApp.addProject.AddProjectActivity"/>
+
+        <provider
+            android:authorities="${applicationId}.provider"
+            android:name="androidx.core.content.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
+
 
     </application>
 

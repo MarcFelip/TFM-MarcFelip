@@ -42,5 +42,7 @@
     <string name="delete_project_text">Are you sure you want to delete the project? Once deleted, it cannot be recovered.</string>
     <string name="edit_project">Edit Project</string>
     <string name="no">No</string>
+    <string name="histogram">Project Histogram</string>
+    <string name="close">Close</string>
 
 </resources>

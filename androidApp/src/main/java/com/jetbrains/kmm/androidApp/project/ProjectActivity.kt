@@ -1,31 +1,47 @@
 package com.jetbrains.kmm.androidApp.project
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
+import android.content.Context
 import kotlinx.coroutines.*
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.drawable.ColorDrawable
+import android.media.ExifInterface
+import android.net.ConnectivityManager
+import android.net.Uri
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.*
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputEditText
+import com.jetbrains.androidApp.BuildConfig
 import com.jetbrains.androidApp.R
 import com.jetbrains.kmm.androidApp.main.MainActivity
 import com.jetbrains.kmm.androidApp.profile.ProfileActivity
 import com.jetbrains.kmm.androidApp.project.adapter.ImagesAdapter
 import com.jetbrains.kmm.shared.Models
+import java.io.File
+import java.io.IOException
+import java.util.*
+
 
 class ProjectActivity : AppCompatActivity(), ImagesAdapter.onClickListener {
 
@@ -36,6 +52,11 @@ class ProjectActivity : AppCompatActivity(), ImagesAdapter.onClickListener {
     private lateinit var project_id: String
     private lateinit var imageBitmap: Bitmap
     private var loadedImages: List<Models.AppleImages> = emptyList()
+
+    private var photoPath: String? = null
+    val REQUEST_TAKE_PHOTO = 1
+    private val REQUEST_CAMERA_PERMISSION = 100
+
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,10 +126,14 @@ class ProjectActivity : AppCompatActivity(), ImagesAdapter.onClickListener {
         val btnCancel = dialog.findViewById<Button>(R.id.btn_cancel)
         val textSize = dialog.findViewById<TextInputEditText>(R.id.size)
 
+        if (!isOnline(this)) {
+            Toast.makeText(this@ProjectActivity, "No internet connection", Toast.LENGTH_SHORT).show()
+        }
+
         imageView = dialog.findViewById(R.id.imageViewApple)
 
         btnCamera.setOnClickListener {
-            startForResult.launch(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
+            checkCameraPermission()
         }
 
         btnSave.setOnClickListener {
@@ -118,6 +143,7 @@ class ProjectActivity : AppCompatActivity(), ImagesAdapter.onClickListener {
 
                 if(success){
                     dialog.dismiss()
+                    initRecyclerView()
                 }
                 else {
                     Toast.makeText(this@ProjectActivity, "Error uploading image", Toast.LENGTH_SHORT).show()
@@ -134,15 +160,107 @@ class ProjectActivity : AppCompatActivity(), ImagesAdapter.onClickListener {
         dialog.show()
     }
 
-    // Request to get an image from the camera or gallery
-    private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            result: ActivityResult ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val intent = result.data
-            imageBitmap = intent?.extras?.get("data") as Bitmap
+    private fun takePicture() {
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        if (intent.resolveActivity(packageManager) != null) {
+            var photoFile: File? = null
+            try {
+                photoFile = createImageFile()
+            } catch (e: IOException) {
+            }
+
+            if (photoFile != null) {
+                val photoUri = FileProvider.getUriForFile(
+                    this,
+                    "${BuildConfig.APPLICATION_ID}.provider",
+                    photoFile
+                )
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+                startActivityForResult(intent, REQUEST_TAKE_PHOTO)
+            }
+        }
+    }
+
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK) {
+            val originalBitmap = BitmapFactory.decodeFile(photoPath)
+            imageBitmap = rotateImageIfRequired(this, originalBitmap, Uri.fromFile(File(photoPath)))
+
             imageView.setImageBitmap(imageBitmap)
         }
     }
+
+    @Throws(IOException::class)
+    fun rotateImageIfRequired(context: Context, img: Bitmap, selectedImage: Uri): Bitmap {
+
+        val input = context.contentResolver.openInputStream(selectedImage)
+        val ei: ExifInterface
+        ei = if (Build.VERSION.SDK_INT > 23) ExifInterface(input!!)
+        else ExifInterface(selectedImage.path!!)
+
+        val orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+
+        return when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> rotateImage(img, 90f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> rotateImage(img, 180f)
+            ExifInterface.ORIENTATION_ROTATE_270 -> rotateImage(img, 270f)
+            else -> img
+        }
+    }
+
+    fun rotateImage(img: Bitmap, degree: Float): Bitmap {
+        val matrix = Matrix()
+        matrix.postRotate(degree)
+        return Bitmap.createBitmap(img, 0, 0, img.width, img.height, matrix, true)
+    }
+
+
+    fun checkCameraPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.CAMERA),
+                REQUEST_CAMERA_PERMISSION
+            )
+        } else {
+            takePicture()
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                takePicture()
+            } else {
+                Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+
+    private fun createImageFile(): File? {
+        val fileName = "AppleImage"
+        val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val image = File.createTempFile(
+            fileName,
+            ".jpg",
+            storageDir
+        )
+        photoPath = image.absolutePath
+        return image
+    }
+
 
     //Dialog to delete an image from the project
     @SuppressLint("NotifyDataSetChanged")
@@ -171,6 +289,7 @@ class ProjectActivity : AppCompatActivity(), ImagesAdapter.onClickListener {
 
         dialog.show()
     }
+
 
     //Dialog to edit project information
     private fun editProjectDialog(project_id: String, p_name: String, p_data: String, p_location: String, p_variety: String) {
@@ -281,4 +400,11 @@ class ProjectActivity : AppCompatActivity(), ImagesAdapter.onClickListener {
             deleteImageDialog(imageId, projectId)
         }
     }
+
+    fun isOnline(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = connectivityManager.activeNetworkInfo
+        return networkInfo != null && networkInfo.isConnected
+    }
+
 }
