@@ -57,5 +57,5 @@ dependencies {
     implementation ("com.github.bumptech.glide:glide:4.12.0")
     implementation ("com.afollestad.material-dialogs:core:3.3.0")
     implementation ("de.hdodenhof:circleimageview:3.1.0")
-
+    implementation ("org.tensorflow:tensorflow-lite:2.4.0")
 }

@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
-import kotlinx.coroutines.*
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -17,13 +16,14 @@ import android.media.ExifInterface
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -38,9 +38,17 @@ import com.jetbrains.kmm.androidApp.main.MainActivity
 import com.jetbrains.kmm.androidApp.profile.ProfileActivity
 import com.jetbrains.kmm.androidApp.project.adapter.ImagesAdapter
 import com.jetbrains.kmm.shared.Models
+import kotlinx.coroutines.*
+import org.tensorflow.lite.Interpreter
 import java.io.File
+import java.io.FileInputStream
 import java.io.IOException
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.channels.FileChannel
 import java.util.*
+
+
 
 
 class ProjectActivity : AppCompatActivity(), ImagesAdapter.onClickListener {
@@ -56,7 +64,13 @@ class ProjectActivity : AppCompatActivity(), ImagesAdapter.onClickListener {
     private var photoPath: String? = null
     val REQUEST_TAKE_PHOTO = 1
     private val REQUEST_CAMERA_PERMISSION = 100
+    var currentFocalLength: Float? = null
+    val realFocalLength = 4.53f
+    val cropFactor = 7.2f
 
+
+    private val job = Job()
+    private val uiScope = CoroutineScope(Dispatchers.Main + job)
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -160,13 +174,14 @@ class ProjectActivity : AppCompatActivity(), ImagesAdapter.onClickListener {
         dialog.show()
     }
 
+    @SuppressLint("QueryPermissionsNeeded")
     private fun takePicture() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         if (intent.resolveActivity(packageManager) != null) {
             var photoFile: File? = null
             try {
                 photoFile = createImageFile()
-            } catch (e: IOException) {
+            } catch (_: IOException) {
             }
 
             if (photoFile != null) {
@@ -181,8 +196,6 @@ class ProjectActivity : AppCompatActivity(), ImagesAdapter.onClickListener {
         }
     }
 
-
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -191,8 +204,31 @@ class ProjectActivity : AppCompatActivity(), ImagesAdapter.onClickListener {
             imageBitmap = rotateImageIfRequired(this, originalBitmap, Uri.fromFile(File(photoPath)))
 
             imageView.setImageBitmap(imageBitmap)
+
+            // Inference on CNN
+            val assetManager = assets
+            val modelPath = "best_m_float32.tflite"
+            val fileDescriptor = assetManager.openFd(modelPath)
+            val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
+            val fileChannel = inputStream.channel
+            val startOffset = fileDescriptor.startOffset
+            val length = fileDescriptor.length
+            val modelByteBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, length)
+
+            val interpreter = Interpreter(modelByteBuffer)
+
+
+            // Process image
+            val options = BitmapFactory.Options()
+            val bitmapFromFile = BitmapFactory.decodeFile(photoPath)
+            lifecycleScope.launch {
+                val appleSize = processImage(bitmapFromFile, interpreter)
+            }
+
+            // interpreter.close()
         }
     }
+
 
     @Throws(IOException::class)
     fun rotateImageIfRequired(context: Context, img: Bitmap, selectedImage: Uri): Bitmap {
@@ -252,13 +288,13 @@ class ProjectActivity : AppCompatActivity(), ImagesAdapter.onClickListener {
     private fun createImageFile(): File? {
         val fileName = "AppleImage"
         val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        val image = File.createTempFile(
+        var image_file = File.createTempFile(
             fileName,
             ".jpg",
             storageDir
         )
-        photoPath = image.absolutePath
-        return image
+        photoPath = image_file.absolutePath
+        return image_file
     }
 
 
@@ -405,6 +441,101 @@ class ProjectActivity : AppCompatActivity(), ImagesAdapter.onClickListener {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo = connectivityManager.activeNetworkInfo
         return networkInfo != null && networkInfo.isConnected
+    }
+
+
+    fun resizeBitmap(bitmap: Bitmap, width: Int, height: Int): Bitmap {
+        return Bitmap.createScaledBitmap(bitmap, width, height, true)
+    }
+
+
+    // Función para convertir Bitmap a ByteBuffer
+    fun convertBitmapToByteBuffer(bitmap: Bitmap): ByteBuffer {
+        val width = bitmap.width
+        val height = bitmap.height
+        val byteBuffer = ByteBuffer.allocateDirect(4 * width * height * 3) // Asumiendo RGB
+        byteBuffer.order(ByteOrder.nativeOrder())
+        val intValues = IntArray(width * height)
+
+        bitmap.getPixels(intValues, 0, width, 0, 0, width, height)
+        var pixel = 0
+        for (i in 0 until width) {
+            for (j in 0 until height) {
+                val value = intValues[pixel++]
+
+                try {
+                    byteBuffer.putFloat((value shr 16 and 0xFF) / 255.0f) // Red
+                    byteBuffer.putFloat((value shr 8 and 0xFF) / 255.0f)  // Green
+                    byteBuffer.putFloat((value and 0xFF) / 255.0f)        // Blue
+                } catch (e: Exception) {
+                    Log.e("Error", "Error al poner flotante en ByteBuffer", e)
+                }
+            }
+        }
+        return byteBuffer
+    }
+
+
+    private fun calculateMaxDiameter(mask: List<Pair<Float, Float>>): Float {
+        // Esta es una suposición simple. En el código Python proporcionado, no se muestra la implementación exacta de `calculate_max_diameter`.
+        var maxDiameter = 0f
+        for (i in mask.indices) {
+            for (j in i + 1 until mask.size) {
+                val distance = Math.sqrt(
+                    Math.pow((mask[j].first - mask[i].first).toDouble(), 2.0) +
+                            Math.pow((mask[j].second - mask[i].second).toDouble(), 2.0)
+                ).toFloat()
+                if (distance > maxDiameter) maxDiameter = distance
+            }
+        }
+        return maxDiameter
+    }
+
+    private suspend fun processImage(bitmap: Bitmap, model: Interpreter): Float {
+        var appleSizeAdjusted = 0f
+
+        withContext(Dispatchers.Default) {
+            val resizedBitmap = resizeBitmap(bitmap, 640, 640)
+            val byteBuffer = convertBitmapToByteBuffer(resizedBitmap)
+
+            val output = Array(1) { Array(38) { FloatArray(8400) } }
+
+            model.run(byteBuffer, output)
+
+            val masksDiamDict = mutableMapOf<String, Float>()
+
+            val width = resizedBitmap.width
+            val height = resizedBitmap.height
+
+            for (r in output) {
+                for (box in r) {
+                    val classIndex = box[5].toInt()
+                    val classNames = arrayOf("apple", "support")  // Suponiendo que estos son tus dos nombres de clases
+
+                    val className = classNames[classIndex]
+
+                    val maskNormalized = box.slice(0..37).map { Pair(it % width, it / width) }  // Suposición basada en tu estructura
+                    val maskUnnormalized = maskNormalized.map { Pair(it.first * width, it.second * height) }
+
+                    val diameter = calculateMaxDiameter(maskUnnormalized)
+                    masksDiamDict[className] = diameter
+                }
+            }
+
+            val supportDiameterPixels = masksDiamDict["support"] ?: 0f
+            val appleDiameterPixels = masksDiamDict["apple"] ?: 0f
+
+            val sizeRatio = appleDiameterPixels / supportDiameterPixels
+
+            val distanceDifference = 5.0
+            val focalLength = 26.0
+
+            val ZaZsRatio = (distanceDifference + focalLength) / focalLength
+
+            appleSizeAdjusted = (20 * sizeRatio * ZaZsRatio).toFloat()
+        }
+
+        return appleSizeAdjusted
     }
 
 }
