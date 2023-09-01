@@ -47,7 +47,8 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.channels.FileChannel
 import java.util.*
-
+import kotlin.math.max
+import kotlin.math.min
 
 
 
@@ -223,6 +224,7 @@ class ProjectActivity : AppCompatActivity(), ImagesAdapter.onClickListener {
             val bitmapFromFile = BitmapFactory.decodeFile(photoPath)
             lifecycleScope.launch {
                 val appleSize = processImage(bitmapFromFile, interpreter)
+                println("Apple size: $appleSize")
             }
 
             // interpreter.close()
@@ -444,12 +446,13 @@ class ProjectActivity : AppCompatActivity(), ImagesAdapter.onClickListener {
     }
 
 
+    //Resize bitmap
     fun resizeBitmap(bitmap: Bitmap, width: Int, height: Int): Bitmap {
         return Bitmap.createScaledBitmap(bitmap, width, height, true)
     }
 
 
-    // Función para convertir Bitmap a ByteBuffer
+    // Convert Bitmap to ByteBuffer
     fun convertBitmapToByteBuffer(bitmap: Bitmap): ByteBuffer {
         val width = bitmap.width
         val height = bitmap.height
@@ -475,67 +478,169 @@ class ProjectActivity : AppCompatActivity(), ImagesAdapter.onClickListener {
         return byteBuffer
     }
 
-
-    private fun calculateMaxDiameter(mask: List<Pair<Float, Float>>): Float {
-        // Esta es una suposición simple. En el código Python proporcionado, no se muestra la implementación exacta de `calculate_max_diameter`.
-        var maxDiameter = 0f
-        for (i in mask.indices) {
-            for (j in i + 1 until mask.size) {
-                val distance = Math.sqrt(
-                    Math.pow((mask[j].first - mask[i].first).toDouble(), 2.0) +
-                            Math.pow((mask[j].second - mask[i].second).toDouble(), 2.0)
-                ).toFloat()
-                if (distance > maxDiameter) maxDiameter = distance
-            }
-        }
-        return maxDiameter
-    }
-
-    private suspend fun processImage(bitmap: Bitmap, model: Interpreter): Float {
-        var appleSizeAdjusted = 0f
+    // Do the inference to the model and post process the results
+    private suspend fun processImage(bitmap: Bitmap, model: Interpreter): Double {
+        var appleSizeAdjusted:  Double = 0.0
+        val focalLength = 26
 
         withContext(Dispatchers.Default) {
             val resizedBitmap = resizeBitmap(bitmap, 640, 640)
             val byteBuffer = convertBitmapToByteBuffer(resizedBitmap)
 
+            println("Byte Buffer to Inference: $byteBuffer")
             val output = Array(1) { Array(38) { FloatArray(8400) } }
-
             model.run(byteBuffer, output)
 
-            val masksDiamDict = mutableMapOf<String, Float>()
+            val confidenceThreshold = 0.8f
+            val nmsThreshold = 0.3f
 
-            val width = resizedBitmap.width
-            val height = resizedBitmap.height
+            // FIlter index by confidence
+            val confidenceAppleIndices = mutableListOf<Int>()
+            val confidenceSupportIndices = mutableListOf<Int>()
+            for (i in 0 until 8399) {
+                val confidenceApple = output[0][4][i]  // Index 4: "Apple"
+                val confidenceSupport = output[0][5][i]  //Index 5: "Support"
 
-            for (r in output) {
-                for (box in r) {
-                    val classIndex = box[5].toInt()
-                    val classNames = arrayOf("apple", "support")  // Suponiendo que estos son tus dos nombres de clases
-
-                    val className = classNames[classIndex]
-
-                    val maskNormalized = box.slice(0..37).map { Pair(it % width, it / width) }  // Suposición basada en tu estructura
-                    val maskUnnormalized = maskNormalized.map { Pair(it.first * width, it.second * height) }
-
-                    val diameter = calculateMaxDiameter(maskUnnormalized)
-                    masksDiamDict[className] = diameter
+                if (confidenceApple > confidenceThreshold) {
+                    confidenceAppleIndices.add(i)
+                }
+                if (confidenceSupport > confidenceThreshold) {
+                    confidenceSupportIndices.add(i)
                 }
             }
 
-            val supportDiameterPixels = masksDiamDict["support"] ?: 0f
-            val appleDiameterPixels = masksDiamDict["apple"] ?: 0f
+            // Get all the bboxes
+            val finalBoxesAndClasses = mutableListOf<Map<String, Any>>()
+            for ((indices, className) in listOf(
+                Pair(confidenceAppleIndices, "Apple"),
+                Pair(confidenceSupportIndices, "Support")
+            )) {
+                val boxes = mutableListOf<List<Int>>()
+                for (index in indices) {
+                    val xCenter = output[0][0][index]
+                    val yCenter = output[0][1][index]
+                    val width = output[0][2][index]
+                    val height = output[0][3][index]
 
-            val sizeRatio = appleDiameterPixels / supportDiameterPixels
+                    val x1 = ((xCenter - width / 2) * 640).toInt()
+                    val y1 = ((yCenter - height / 2) * 640).toInt()
+                    val x2 = ((xCenter + width / 2) * 640).toInt()
+                    val y2 = ((yCenter + height / 2) * 640).toInt()
+                    boxes.add(listOf(x1, y1, x2, y2))
+                }
 
-            val distanceDifference = 5.0
-            val focalLength = 26.0
+                val scores = FloatArray(indices.size) {
+                    output[0][4][indices[it]]
+                }.toList()
 
-            val ZaZsRatio = (distanceDifference + focalLength) / focalLength
+                val indicesToKeep = applyNMS(boxes, scores, nmsThreshold)
 
-            appleSizeAdjusted = (20 * sizeRatio * ZaZsRatio).toFloat()
+                for (i in indicesToKeep) {
+                    val (x1, y1, x2, y2) = boxes[i]
+                    finalBoxesAndClasses.add(
+                        mapOf(
+                            "box" to listOf(x1, y1, x2, y2),
+                            "class" to className,
+                            "index" to indicesToKeep[0]
+                        )
+                    )
+                }
+            }
+
+            println("finalBoxesAndClasses: $finalBoxesAndClasses")
+
+            // Store bboxes of the apples and supports
+            val appleBoxes = finalBoxesAndClasses.filter { it["class"] == "Apple" }.map { it["box"] as List<Int> }
+            val supportBoxes = finalBoxesAndClasses.filter { it["class"] == "Support" }.map { it["box"] as List<Int> }
+
+            // Filter bboxes of apples with intersection with the support in case of more than one apple
+            val filteredAppleBoxes = if (appleBoxes.size == 1) {
+                appleBoxes
+            } else {
+                appleBoxes.filter { appleBox ->
+                    supportBoxes.none { supportBox -> bboxIntersection(appleBox, supportBox) }
+                }
+            }
+
+            // Diameter in px
+            val appleDiameterPx = calculateMaxBBoxDistance(filteredAppleBoxes.firstOrNull())
+            val supportDiameterPx = calculateMaxBBoxDistance(supportBoxes.firstOrNull())
+
+            // Calculate final predicted size of the apple
+            val appleMm = (appleDiameterPx * 20) / supportDiameterPx
+            val distanceDifference = (appleMm / 2) * 0.1
+            val zaZsRatio = (distanceDifference + focalLength) / focalLength
+            appleSizeAdjusted = appleMm * zaZsRatio
+
         }
 
         return appleSizeAdjusted
+    }
+
+    // Function to calculate the intersection between two bboxes
+    fun bboxIntersection(box1: List<Int>, box2: List<Int>): Boolean {
+        val xx1 = max(box1[0], box2[0])
+        val yy1 = max(box1[1], box2[1])
+        val xx2 = min(box1[2], box2[2])
+        val yy2 = min(box1[3], box2[3])
+
+        val w = max(0, xx2 - xx1)
+        val h = max(0, yy2 - yy1)
+
+        return w * h > 0
+    }
+
+
+    // Non Maximum Suppression (NMS) function to get the bbox with more conf in case of overlapping
+    fun applyNMS(boxes: List<List<Int>>, scores: List<Float>, nmsThreshold: Float): List<Int> {
+        val areas = boxes.map { (it[2] - it[0]) * (it[3] - it[1]) }
+        val sortedIndices = scores.indices.sortedByDescending { scores[it] }.toMutableList()
+
+        val keep = mutableListOf<Int>()
+
+        while (sortedIndices.isNotEmpty()) {
+            val i = sortedIndices.removeAt(0)
+            keep.add(i)
+
+            val toDelete = mutableListOf<Int>()
+
+            for (j in sortedIndices) {
+                if (bboxIntersection(boxes[i], boxes[j])) {
+                    val xx1 = max(boxes[i][0], boxes[j][0])
+                    val yy1 = max(boxes[i][1], boxes[j][1])
+                    val xx2 = min(boxes[i][2], boxes[j][2])
+                    val yy2 = min(boxes[i][3], boxes[j][3])
+
+                    val w = max(0, xx2 - xx1)
+                    val h = max(0, yy2 - yy1)
+                    val intersectArea = w * h
+                    val unionArea = areas[i] + areas[j] - intersectArea
+
+                    if (intersectArea / unionArea.toFloat() > nmsThreshold) {
+                        toDelete.add(j)
+                    }
+                }
+            }
+
+            sortedIndices.removeAll(toDelete)
+        }
+
+        return keep
+    }
+
+
+    // Calculate highest size distance
+    fun calculateMaxBBoxDistance(bbox: List<Int>?): Int {
+        if (bbox == null) return 0
+        val x1 = bbox[0]
+        val y1 = bbox[1]
+        val x2 = bbox[2]
+        val y2 = bbox[3]
+
+        val horizontalDistance = kotlin.math.abs(x2 - x1)
+        val verticalDistance = kotlin.math.abs(y2 - y1)
+
+        return max(horizontalDistance, verticalDistance)
     }
 
 }
